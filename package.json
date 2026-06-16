@@ -1,0 +1,7 @@
+{
+  "name": "SkillForSkill",
+  "version": "0.0.0",
+  "description": "Record repeated agent work patterns and suggest reusable skill candidates.",
+  "private": true,
+  "scripts": {}
+}
