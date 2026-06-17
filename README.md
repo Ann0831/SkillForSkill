@@ -1,6 +1,6 @@
 # SkillForSkill
 
-SkillForSkill helps Codex or Claude Code notice repeated work patterns and turn them into reusable skill candidates.
+SkillForSkill helps Codex notice repeated work patterns and turn them into reusable skill candidates.
 
 After each meaningful task, the installed SkillForSkill instructions guide the agent to:
 
@@ -15,75 +15,47 @@ This project is an MVP. It records work samples and creates potential skill draf
 ## Requirements
 
 - Node.js
-- Codex or Claude Code
-- macOS/Linux shell, WSL/Git Bash, or native Windows Command Prompt/PowerShell
+- Codex
+- macOS/Linux shell, WSL, or Git Bash
 
 No `npm install` or build step is required for normal use. The project currently uses only Node.js built-in modules and local files.
 
 ## Installation
 
-Clone or download this repository, then run the installer for the agent you use.
+Clone or download this repository, then run the installer.
 
 ### macOS, Linux, WSL, or Git Bash
 
 Install for Codex:
 
 ```bash
-./install.sh --target codex
-```
-
-Install for Claude Code:
-
-```bash
-./install.sh --target claude
-```
-
-If `--target` is omitted, the installer defaults to Codex:
-
-```bash
 ./install.sh
 ```
 
-### Windows
+You can also pass the target explicitly:
 
-On native Windows, use the `.cmd` wrappers instead of the shell scripts.
-
-1. Download the project ZIP from GitHub or clone the repository.
-2. Install Node.js if it is not already installed.
-3. Open Command Prompt or PowerShell in the project folder.
-4. Run one of the installers below.
-
-Install for Codex:
-
-```bat
-install-windows.cmd --target codex
+```bash
+./install.sh --target codex
 ```
 
-Install for Claude Code:
-
-```bat
-install-windows.cmd --target claude
-```
+If `--target` is omitted, the installer defaults to Codex.
 
 ## What Installation Does
 
 The installer generates `skills/SkillForSkill/SKILL.md` from `agent-operations.md`, replacing local placeholders with:
 
 - The absolute path to this repository's `main.js`.
-- The storage directory `~/.SkillForSkillStorage` or `%USERPROFILE%\.SkillForSkillStorage`.
+- The storage directory `~/.SkillForSkillStorage`.
 
-Then it installs the generated skill into the selected agent:
+Then it installs the generated skill into Codex:
 
 | Target | Skill install path | Global instruction file |
 | --- | --- | --- |
 | Codex | `~/.codex/skills/SkillForSkill` | `~/.codex/config.toml` |
-| Claude Code | `~/.claude/skills/SkillForSkill` | `~/.claude/CLAUDE.md` |
-
-On Windows, the same paths are created under `%USERPROFILE%`.
 
 The global instruction block is wrapped with SkillForSkill markers so uninstall can remove only the block it added.
 
-After installing, restart Codex or Claude Code, or open a new session/thread, so the agent reloads skill metadata and global instructions.
+After installing, restart Codex or open a new thread, so the agent reloads skill metadata and global instructions.
 
 ## Uninstallation
 
@@ -92,32 +64,18 @@ After installing, restart Codex or Claude Code, or open a new session/thread, so
 Uninstall from Codex:
 
 ```bash
-./uninstall.sh --target codex
+./uninstall.sh
 ```
 
-Uninstall from Claude Code:
+You can also pass the target explicitly:
 
 ```bash
-./uninstall.sh --target claude
+./uninstall.sh --target codex
 ```
 
 If `--target` is omitted, uninstall defaults to Codex.
 
-### Windows
-
-Uninstall from Codex:
-
-```bat
-uninstall-windows.cmd --target codex
-```
-
-Uninstall from Claude Code:
-
-```bat
-uninstall-windows.cmd --target claude
-```
-
-Uninstall removes the installed `SkillForSkill` skill directory and removes the marked global instruction block. It does not delete `~/.SkillForSkillStorage` or `%USERPROFILE%\.SkillForSkillStorage`.
+Uninstall removes the installed `SkillForSkill` skill directory and removes the marked global instruction block. It does not delete `~/.SkillForSkillStorage`.
 
 ## Data Storage
 
@@ -125,12 +83,6 @@ SkillForSkill stores its data in:
 
 ```txt
 ~/.SkillForSkillStorage
-```
-
-On native Windows:
-
-```txt
-%USERPROFILE%\.SkillForSkillStorage
 ```
 
 The storage layout is:
@@ -162,7 +114,7 @@ A work category becomes a skill candidate when its task count is greater than th
 Agents normally run these commands through the installed SkillForSkill instructions. You can also run them manually:
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- <command> [--key value]
+node [absolute path to SkillForSkill]/main.js --- <command> [--key value]
 ```
 
 Available commands:
@@ -183,7 +135,5 @@ CLI output is JSON.
 ## Notes
 
 - `install.sh` and `uninstall.sh` are for macOS, Linux, WSL, or Git Bash.
-- `install-windows.cmd` and `uninstall-windows.cmd` are for native Windows.
-- Installing for Codex and Claude Code is supported, but each target must be installed separately.
-- The installer overwrites the selected agent's installed `SkillForSkill` directory with the current project version.
+- The installer overwrites Codex's installed `SkillForSkill` directory with the current project version.
 - This project creates potential skill drafts; it does not publish or install those drafts automatically.
