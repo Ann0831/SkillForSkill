@@ -10,7 +10,9 @@ After each meaningful task, the installed SkillForSkill instructions guide the a
 - Suggest a potential skill when a work category appears often enough.
 - Respect user decisions to reject or stop prompting for certain skill ideas.
 
-This project is an MVP. It records work samples and creates potential skill drafts, but it does not automatically install generated skill candidates.
+This project is still in its early stages. It records work samples and creates potential skill drafts.
+
+Feedback and suggestions are welcome. Feel free to open an issue or contact me at chenian20454@gmail.com.
 
 ## Requirements
 
