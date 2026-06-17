@@ -1,6 +1,6 @@
 # Agent Operations Guide
 
-This document defines how an agent should use `skill_candidate_detector` after completing a user task: record the task, classify the work, check skill candidates, and handle potential skills based on the user's response.
+This document defines how an agent should use `SkillForSkill` after completing a user task: record the task, classify the work, check skill candidates, and handle potential skills based on the user's response.
 
 ## Trigger Timing
 

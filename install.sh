@@ -3,7 +3,8 @@ set -euo pipefail
 
 SKILL_NAME="SkillForSkill"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_SKILL_DIR="${SCRIPT_DIR}/skills/${SKILL_NAME}"
+GENERATED_SKILLS_DIR="${SCRIPT_DIR}/skills"
+PROJECT_SKILL_DIR="${GENERATED_SKILLS_DIR}/${SKILL_NAME}"
 SOURCE_DOC="${SCRIPT_DIR}/agent-operations.md"
 TARGET_SKILL_MD="${PROJECT_SKILL_DIR}/SKILL.md"
 MAIN_JS_PATH="${SCRIPT_DIR}/main.js"
@@ -79,7 +80,7 @@ mkdir -p "${PROJECT_SKILL_DIR}"
 cat > "${TARGET_SKILL_MD}" <<'EOF'
 ---
 name: SkillForSkill
-description: Use at the end of every meaningful user task that produced code, files, analysis, commands, debugging, implementation, documentation, or other reusable work, to decide whether to record the task in skill_candidate_detector, classify work, add tasks, evaluate skill candidates, create potential skills, or process user confirmation about suggested skills.
+description: Use at the end of every meaningful user task that produced code, files, analysis, commands, debugging, implementation, documentation, or other reusable work, to decide whether to record the task in SkillForSkill, classify work, add tasks, evaluate skill candidates, create potential skills, or process user confirmation about suggested skills.
 ---
 
 EOF
@@ -100,8 +101,10 @@ if [[ "${TARGET}" == "codex" ]]; then
   rm -rf "${USER_SKILL_DIR}"
   cp -R "${PROJECT_SKILL_DIR}" "${USER_SKILLS_DIR}/"
   node "${CODEX_CONFIG_HELPER}" install "${CODEX_CONFIG_PATH}"
+  rm -rf "${GENERATED_SKILLS_DIR}"
 
   echo "Installed ${SKILL_NAME} to ${USER_SKILL_DIR}"
+  echo "Removed generated project skill directory: ${GENERATED_SKILLS_DIR}"
   echo "CLI entrypoint: ${MAIN_JS_PATH}"
   echo "Data directory: ${DATA_DIR}"
   echo "Codex config: ${CODEX_CONFIG_PATH}"
@@ -116,8 +119,10 @@ mkdir -p "${USER_SKILLS_DIR}"
 rm -rf "${USER_SKILL_DIR}"
 cp -R "${PROJECT_SKILL_DIR}" "${USER_SKILLS_DIR}/"
 node "${CLAUDE_MEMORY_HELPER}" install "${CLAUDE_MEMORY_PATH}"
+rm -rf "${GENERATED_SKILLS_DIR}"
 
 echo "Installed ${SKILL_NAME} to ${USER_SKILL_DIR}"
+echo "Removed generated project skill directory: ${GENERATED_SKILLS_DIR}"
 echo "CLI entrypoint: ${MAIN_JS_PATH}"
 echo "Data directory: ${DATA_DIR}"
 echo "Claude memory: ${CLAUDE_MEMORY_PATH}"

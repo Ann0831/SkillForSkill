@@ -42,18 +42,20 @@ If `--target` is omitted, the installer defaults to Codex.
 
 ## What Installation Does
 
-The installer generates `skills/SkillForSkill/SKILL.md` from `agent-operations.md`, replacing local placeholders with:
+The installer temporarily generates `skills/SkillForSkill/SKILL.md` from `agent-operations.md`, replacing local placeholders with:
 
 - The absolute path to this repository's `main.js`.
 - The storage directory `~/.SkillForSkillStorage`.
 
-Then it installs the generated skill into Codex:
+Then it installs the generated skill into Codex and removes the temporary project `skills/` directory after the copy and config update succeed:
 
 | Target | Skill install path | Global instruction file |
 | --- | --- | --- |
 | Codex | `~/.codex/skills/SkillForSkill` | `~/.codex/config.toml` |
 
 The global instruction block is wrapped with SkillForSkill markers so uninstall can remove only the block it added.
+
+The repository's `skills/` directory is an install-time generated artifact. It is not kept in the project after a successful install; the runtime copy lives under the target user's skill directory.
 
 After installing, restart Codex or open a new thread, so the agent reloads skill metadata and global instructions.
 

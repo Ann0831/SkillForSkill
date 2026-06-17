@@ -1,11 +1,11 @@
 # Skill Candidate Detector Commands
 
-This file defines the commands developers can use when operating the `skill_candidate_detector` MVP. After installation, agents should treat the generated `SkillForSkill/SKILL.md` as the source of truth and run commands with the local absolute `main.js` path written during installation.
+This file defines the commands developers can use when operating the `SkillForSkill` MVP. After installation, agents should treat the generated `SkillForSkill/SKILL.md` as the source of truth and run commands with the local absolute `main.js` path written during installation.
 
 All commands are executed through the CLI by default:
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- <command> [--key value]
+node /absolute/path/to/SkillForSkill/main.js --- <command> [--key value]
 ```
 
 CLI output is JSON so agents can read it and decide the next step.
@@ -15,7 +15,7 @@ CLI output is JSON so agents can read it and decide the next step.
 Reads the current work folders under `work/`, allowing the agent to decide whether a new task should be added to an existing work folder or whether a new work folder is needed.
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- list-works
+node /absolute/path/to/SkillForSkill/main.js --- list-works
 ```
 
 By default, this lists only work folders under `work/` and does not read `discarded_work/`.
@@ -23,7 +23,7 @@ By default, this lists only work folders under `work/` and does not read `discar
 To also read discarded work that the user has marked as unnecessary for future handling, use:
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- list-works --includeFutureUnneededDiscardedWork true
+node /absolute/path/to/SkillForSkill/main.js --- list-works --includeFutureUnneededDiscardedWork true
 ```
 
 This parameter only additionally lists work in `discarded_work/` where `isFutureWorkUnneeded: true`; discarded work where `isFutureWorkUnneeded: false` is not listed.
@@ -44,7 +44,7 @@ Each returned work includes:
 Lists work types under `work/` that have exceeded the task-count threshold and do not yet have a potential skill.
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- list-work-candidates
+node /absolute/path/to/SkillForSkill/main.js --- list-work-candidates
 ```
 
 Results are sorted by work folder creation time from oldest to newest. If creation times are equal, results are sorted by `workName`.
@@ -52,7 +52,7 @@ Results are sorted by work folder creation time from oldest to newest. If creati
 Use `taskLimit` to override `workTaskLimit` from `config.json`:
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- list-work-candidates --taskLimit 5
+node /absolute/path/to/SkillForSkill/main.js --- list-work-candidates --taskLimit 5
 ```
 
 Each returned candidate work includes:
@@ -73,13 +73,13 @@ Each returned candidate work includes:
 Lists all potential skill Markdown draft paths under `potential_skill/`.
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- list-potential-skills
+node /absolute/path/to/SkillForSkill/main.js --- list-potential-skills
 ```
 
 By default, this reads `~/.SkillForSkillStorage/potential_skill/`. Use `rootDir` only for tests or special storage locations:
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- list-potential-skills --rootDir /tmp/test-skill-data
+node /absolute/path/to/SkillForSkill/main.js --- list-potential-skills --rootDir /tmp/test-skill-data
 ```
 
 If the `potential_skill/` folder does not exist, the command returns an empty array and does not create the folder.
@@ -98,7 +98,7 @@ Returns a sorted JSON array of Markdown file paths:
 Reads the full content of an active work and builds reference text the agent can use to generate a skill.
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- get-work-skill-reference --workName debugging
+node /absolute/path/to/SkillForSkill/main.js --- get-work-skill-reference --workName debugging
 ```
 
 Effects:
@@ -121,7 +121,7 @@ Returns:
 Adds a work folder and ensures the folder contains `description.md` and `state.json`.
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- add-work --workName debugging --description "Handle debugging tasks and similar work that can be investigated through repeatable steps."
+node /absolute/path/to/SkillForSkill/main.js --- add-work --workName debugging --description "Handle debugging tasks and similar work that can be investigated through repeatable steps."
 ```
 
 Effects:
@@ -137,7 +137,7 @@ Effects:
 Adds a task Markdown file to the specified work.
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- add-task --workName debugging --taskName task-001 --content "# Task"
+node /absolute/path/to/SkillForSkill/main.js --- add-task --workName debugging --taskName task-001 --content "# Task"
 ```
 
 Effects:
@@ -152,7 +152,7 @@ Effects:
 Adds a potential skill Markdown file and marks the source work as having produced a potential skill.
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- add-potential-skill --workName debugging --skillName error-debugging-helper --content "# error-debugging-helper"
+node /absolute/path/to/SkillForSkill/main.js --- add-potential-skill --workName debugging --skillName error-debugging-helper --content "# error-debugging-helper"
 ```
 
 Effects:
@@ -169,7 +169,7 @@ Effects:
 Moves the specified work from `work/` to `discarded_work/`, preserving work types that have been judged unsuitable for conversion into a skill.
 
 ```bash
-node /absolute/path/to/skill_candidate_detector/main.js --- discard-work --workName debugging --isFutureWorkUnneeded true
+node /absolute/path/to/SkillForSkill/main.js --- discard-work --workName debugging --isFutureWorkUnneeded true
 ```
 
 Effects:

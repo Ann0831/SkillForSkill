@@ -7,7 +7,8 @@ const { spawnSync } = require("child_process");
 
 const SKILL_NAME = "SkillForSkill";
 const REPO_ROOT = path.resolve(__dirname, "..");
-const PROJECT_SKILL_DIR = path.join(REPO_ROOT, "skills", SKILL_NAME);
+const GENERATED_SKILLS_DIR = path.join(REPO_ROOT, "skills");
+const PROJECT_SKILL_DIR = path.join(GENERATED_SKILLS_DIR, SKILL_NAME);
 const SOURCE_DOC = path.join(REPO_ROOT, "agent-operations.md");
 const TARGET_SKILL_MD = path.join(PROJECT_SKILL_DIR, "SKILL.md");
 const MAIN_JS_PATH = path.join(REPO_ROOT, "main.js");
@@ -75,7 +76,7 @@ function generateSkillFile() {
   const frontmatter = [
     "---",
     "name: SkillForSkill",
-    "description: Use at the end of every meaningful user task that produced code, files, analysis, commands, debugging, implementation, documentation, or other reusable work, to decide whether to record the task in skill_candidate_detector, classify work, add tasks, evaluate skill candidates, create potential skills, or process user confirmation about suggested skills.",
+    "description: Use at the end of every meaningful user task that produced code, files, analysis, commands, debugging, implementation, documentation, or other reusable work, to decide whether to record the task in SkillForSkill, classify work, add tasks, evaluate skill candidates, create potential skills, or process user confirmation about suggested skills.",
     "---",
     "",
   ].join("\n");
@@ -98,6 +99,11 @@ function copySkillTo(userSkillsDir) {
   fs.cpSync(PROJECT_SKILL_DIR, userSkillDir, { recursive: true });
 
   return userSkillDir;
+}
+
+function removeGeneratedProjectSkills() {
+  fs.rmSync(GENERATED_SKILLS_DIR, { recursive: true, force: true });
+  console.log(`Removed generated project skill directory: ${GENERATED_SKILLS_DIR}`);
 }
 
 function runHelper(helperPath, action, targetPath) {
@@ -129,6 +135,7 @@ function main() {
   if (target === "codex") {
     const userSkillDir = copySkillTo(path.join(HOME_DIR, ".codex", "skills"));
     runHelper(CODEX_CONFIG_HELPER, "install", CODEX_CONFIG_PATH);
+    removeGeneratedProjectSkills();
 
     console.log(`Installed ${SKILL_NAME} to ${userSkillDir}`);
     console.log(`CLI entrypoint: ${MAIN_JS_PATH}`);
@@ -140,6 +147,7 @@ function main() {
 
   const userSkillDir = copySkillTo(path.join(HOME_DIR, ".claude", "skills"));
   runHelper(CLAUDE_MEMORY_HELPER, "install", CLAUDE_MEMORY_PATH);
+  removeGeneratedProjectSkills();
 
   console.log(`Installed ${SKILL_NAME} to ${userSkillDir}`);
   console.log(`CLI entrypoint: ${MAIN_JS_PATH}`);

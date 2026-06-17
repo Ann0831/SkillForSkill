@@ -2,7 +2,7 @@
 
 ## Default Root Directory
 
-The default data root directory for `skill_candidate_detector` is:
+The default data root directory for `SkillForSkill` is:
 
 ```txt
 ~/.SkillForSkillStorage
