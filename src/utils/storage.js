@@ -333,6 +333,21 @@ function addWorkTask(options) {
   return addTaskToWork(options);
 }
 
+function listPotentialSkillPaths({ rootDir = defaultDataDir } = {}) {
+  const potentialSkillDir = path.join(rootDir, "potential_skill");
+
+  if (!fs.existsSync(potentialSkillDir)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(potentialSkillDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+    .map((entry) => entry.name)
+    .sort((a, b) => a.localeCompare(b))
+    .map((fileName) => path.join(potentialSkillDir, fileName));
+}
+
 function addPotentialSkill({
   workName,
   skillName,
@@ -400,5 +415,6 @@ module.exports = {
   discardWork,
   getWorkSkillReference,
   getWorksExceedingTaskLimit,
+  listPotentialSkillPaths,
   listWorks,
 };

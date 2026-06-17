@@ -68,6 +68,31 @@ Each returned candidate work includes:
 - `hasPotentialSkill`
 - `isSkillCandidate`
 
+## `list-potential-skills`
+
+Lists all potential skill Markdown draft paths under `potential_skill/`.
+
+```bash
+node /absolute/path/to/skill_candidate_detector/main.js --- list-potential-skills
+```
+
+By default, this reads `~/.SkillForSkillStorage/potential_skill/`. Use `rootDir` only for tests or special storage locations:
+
+```bash
+node /absolute/path/to/skill_candidate_detector/main.js --- list-potential-skills --rootDir /tmp/test-skill-data
+```
+
+If the `potential_skill/` folder does not exist, the command returns an empty array and does not create the folder.
+
+Returns a sorted JSON array of Markdown file paths:
+
+```json
+[
+  "/Users/example/.SkillForSkillStorage/potential_skill/example-a.md",
+  "/Users/example/.SkillForSkillStorage/potential_skill/example-b.md"
+]
+```
+
 ## `get-work-skill-reference`
 
 Reads the full content of an active work and builds reference text the agent can use to generate a skill.

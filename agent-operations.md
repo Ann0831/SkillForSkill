@@ -40,6 +40,7 @@ Data is stored by default in `__SKILLFORSKILL_DATA_DIR__`. The first time a comm
 This workflow may only use commands that currently exist:
 
 - `list-works`
+- `list-potential-skills`
 - `add-work`
 - `add-task`
 - `add-potential-skill`
@@ -141,6 +142,12 @@ After creating a potential skill, the agent must ask the user whether they want 
 `potential_skill/<skillName>.md` is only a candidate skill draft and must not be treated as an installed skill.
 
 If the user agrees to install it, the agent must convert the candidate Markdown into the formal skill directory structure and then hand it off to the external skill installation mechanism. This project currently has no command for installing a skill.
+
+To locate candidate Markdown drafts before conversion, the agent may list potential skill draft paths:
+
+```bash
+node __SKILLFORSKILL_MAIN_JS__ --- list-potential-skills
+```
 
 A formal skill needs at least:
 

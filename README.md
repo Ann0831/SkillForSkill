@@ -123,6 +123,7 @@ Available commands:
 node main.js --- list-works
 node main.js --- list-works --includeFutureUnneededDiscardedWork true
 node main.js --- list-work-candidates
+node main.js --- list-potential-skills
 node main.js --- get-work-skill-reference --workName <workName>
 node main.js --- add-work --workName <workName> --description "<description>"
 node main.js --- add-task --workName <workName> --taskName <taskName> --content "<taskContent>"

@@ -5,6 +5,7 @@ const {
   discardWork,
   getWorkSkillReference,
   getWorksExceedingTaskLimit,
+  listPotentialSkillPaths,
   listWorks,
 } = require("../utils/storage");
 
@@ -77,6 +78,8 @@ async function runCommand({ command, args = {} }) {
         ...args,
         taskLimit: parseNumberOption(args.taskLimit, "taskLimit"),
       });
+    case "list-potential-skills":
+      return listPotentialSkillPaths(args);
     case "get-work-skill-reference":
       return getWorkSkillReference(args);
     case "add-work":
