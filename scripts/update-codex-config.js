@@ -19,7 +19,7 @@ const GLOBAL_INSTRUCTIONS = [
 ].join("\n");
 
 function usage() {
-  throw new Error("Usage: update-codex-config.js <install|uninstall> <configPath>");
+  throw new Error("Usage: update-codex-config.js <install|uninstall> <configPath> [projectPath]");
 }
 
 function escapeRegExp(value) {
@@ -161,8 +161,76 @@ function uninstallGlobalInstructions(text) {
   };
 }
 
+function escapeTomlBasicString(value) {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/[\b]/g, "\\b")
+    .replace(/\t/g, "\\t")
+    .replace(/\n/g, "\\n")
+    .replace(/\f/g, "\\f")
+    .replace(/\r/g, "\\r");
+}
+
+function findTomlTables(text) {
+  const tables = [];
+  const tablePattern = /^[ \t]*\[([^\]\r\n]+)\][ \t]*(?:#.*)?(?:\r?\n|$)/gm;
+  let match;
+
+  while ((match = tablePattern.exec(text)) !== null) {
+    tables.push({
+      end: match.index + match[0].length,
+      name: match[1],
+      start: match.index,
+    });
+  }
+
+  return tables.map((table, index) => ({
+    ...table,
+    nextStart: index + 1 < tables.length ? tables[index + 1].start : text.length,
+  }));
+}
+
+function removeCodexProjectTrust(text, projectPath) {
+  if (!projectPath) {
+    return { changed: false, text };
+  }
+
+  const projectTableName = `projects."${escapeTomlBasicString(projectPath)}"`;
+  const projectTable = findTomlTables(text).find((table) => table.name === projectTableName);
+
+  if (!projectTable) {
+    return { changed: false, text };
+  }
+
+  const tableBody = text.slice(projectTable.end, projectTable.nextStart);
+  const trustPattern = /^[ \t]*trust_level[ \t]*=[ \t]*"trusted"[ \t]*(?:#.*)?(?:\r?\n|$)/m;
+
+  if (!trustPattern.test(tableBody)) {
+    return { changed: false, text };
+  }
+
+  const nextBody = tableBody.replace(trustPattern, "");
+
+  if (nextBody.trim() === "") {
+    const before = text.slice(0, projectTable.start).replace(/[ \t]*$/g, "");
+    const after = text.slice(projectTable.nextStart).replace(/^\n+/, "");
+    const separator = before && after ? "\n\n" : "";
+
+    return {
+      changed: true,
+      text: `${before}${separator}${after}`,
+    };
+  }
+
+  return {
+    changed: true,
+    text: `${text.slice(0, projectTable.end)}${nextBody}${text.slice(projectTable.nextStart)}`,
+  };
+}
+
 function main() {
-  const [action, configPath] = process.argv.slice(2);
+  const [action, configPath, projectPath] = process.argv.slice(2);
 
   if (!["install", "uninstall"].includes(action) || !configPath) {
     usage();
@@ -173,19 +241,24 @@ function main() {
   const originalText = fs.existsSync(configPath)
     ? fs.readFileSync(configPath, "utf8")
     : "";
-  const result =
+  const instructionsResult =
     action === "install"
       ? installGlobalInstructions(originalText)
       : uninstallGlobalInstructions(originalText);
+  const result =
+    action === "uninstall"
+      ? removeCodexProjectTrust(instructionsResult.text, projectPath)
+      : { changed: false, text: instructionsResult.text };
+  const changed = instructionsResult.changed || result.changed;
 
-  if (result.changed) {
+  if (changed) {
     fs.writeFileSync(configPath, result.text, "utf8");
   }
 
   console.log(
-    result.changed
-      ? `${action}ed SkillForSkill global instructions in ${configPath}`
-      : `SkillForSkill global instructions already ${action === "install" ? "installed" : "removed"} in ${configPath}`,
+    changed
+      ? `${action}ed SkillForSkill Codex config entries in ${configPath}`
+      : `SkillForSkill Codex config entries already ${action === "install" ? "installed" : "removed"} in ${configPath}`,
   );
 }
 

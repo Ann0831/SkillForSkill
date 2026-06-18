@@ -81,7 +81,7 @@ You can also pass the target explicitly:
 
 If `--target` is omitted, uninstall defaults to Codex.
 
-Uninstall removes the installed `SkillForSkill` skill directory and removes the marked global instruction block. It does not delete `~/.SkillForSkillStorage`.
+Uninstall removes the installed `SkillForSkill` skill directory, the marked global instruction block, and the matching Codex project trust entry for this project. It does not delete `~/.SkillForSkillStorage`.
 
 ## Data Storage
 
