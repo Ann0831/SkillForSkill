@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SkillForSkill User Space</title>
+    <link rel="stylesheet" href="/public/user-space.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/user-space">SkillForSkill</a>
+      <div class="topbar-actions">
+        <div id="health" class="health">Checking server...</div>
+        <a class="button-link danger-link" href="/pid">Close server</a>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="page-head">
+        <div>
+          <p class="eyebrow">User Space</p>
+          <h1 id="page-title">Work Overview</h1>
+        </div>
+        <a class="home-link" href="/user-space">Overview</a>
+      </section>
+
+      <section id="app" class="content" aria-live="polite">
+        <div class="loading">Loading...</div>
+      </section>
+    </main>
+
+    <script src="/public/user-space.js"></script>
+  </body>
+</html>

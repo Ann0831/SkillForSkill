@@ -6,6 +6,7 @@ const { defaultDataDir, workTaskLimit } = require("../../config");
 const defaultWorkState = {
   hasPotentialSkill: false,
   isSkillCandidate: null,
+  potentialSkillName: null,
 };
 
 function assertSafeName(name, label) {
@@ -126,6 +127,31 @@ function listTaskFiles(workDir) {
     .sort((a, b) => a.localeCompare(b));
 }
 
+function assertWorkSource(source = "work") {
+  if (source !== "work" && source !== "discarded_work") {
+    throw new Error("source must be work or discarded_work.");
+  }
+
+  return source;
+}
+
+function getWorkDir({ workName, source = "work", rootDir = defaultDataDir }) {
+  const safeWorkName = assertSafeName(workName, "workName");
+  const safeSource = assertWorkSource(source);
+  const workDir = path.join(rootDir, safeSource, safeWorkName);
+
+  if (!fs.existsSync(workDir)) {
+    throw new Error(`Work does not exist: ${workDir}`);
+  }
+
+  return {
+    isDiscarded: safeSource === "discarded_work",
+    source: safeSource,
+    workDir,
+    workName: safeWorkName,
+  };
+}
+
 function addWork({ workName, description = "", rootDir = defaultDataDir }) {
   const safeWorkName = assertSafeName(workName, "workName");
   const workDir = path.join(rootDir, "work", safeWorkName);
@@ -162,6 +188,7 @@ function listWorkEntries(workRootDir, { isDiscarded = false } = {}) {
         isDiscarded,
         isFutureWorkUnneeded: Boolean(state.isFutureWorkUnneeded),
         isSkillCandidate: state.isSkillCandidate,
+        potentialSkillName: state.potentialSkillName || null,
         taskCount: taskFiles.length,
         taskFiles,
         workDir,
@@ -285,6 +312,52 @@ function getWorkSkillReference({ workName, rootDir = defaultDataDir }) {
   };
 }
 
+function getWork({ workName, source = "work", rootDir = defaultDataDir }) {
+  const work = getWorkDir({ workName, source, rootDir });
+  const description = readWorkDescription(work.workDir);
+  const state = readWorkState(work.workDir);
+  const taskFiles = listTaskFiles(work.workDir);
+
+  return {
+    ...work,
+    description,
+    hasPotentialSkill: Boolean(state.hasPotentialSkill),
+    isFutureWorkUnneeded: Boolean(state.isFutureWorkUnneeded),
+    isSkillCandidate: state.isSkillCandidate,
+    potentialSkillName: state.potentialSkillName || null,
+    state,
+    taskCount: taskFiles.length,
+    taskFiles,
+  };
+}
+
+function getTask({
+  workName,
+  taskName,
+  source = "work",
+  rootDir = defaultDataDir,
+}) {
+  const work = getWorkDir({ workName, source, rootDir });
+  const safeTaskName = ensureExtension(assertSafeName(taskName, "taskName"), ".md");
+
+  if (safeTaskName === "description.md") {
+    throw new Error("taskName must refer to a task Markdown file.");
+  }
+
+  const taskPath = path.join(work.workDir, safeTaskName);
+
+  if (!fs.existsSync(taskPath)) {
+    throw new Error(`Task does not exist: ${taskPath}`);
+  }
+
+  return {
+    ...work,
+    content: fs.readFileSync(taskPath, "utf8"),
+    taskName: safeTaskName,
+    taskPath,
+  };
+}
+
 function discardWork({
   workName,
   isFutureWorkUnneeded = false,
@@ -369,12 +442,30 @@ function addPotentialSkill({
 
   fs.mkdirSync(potentialSkillDir, { recursive: true });
   writeTextFile(skillPath, content);
-  const statePath = updateWorkState(workDir, { hasPotentialSkill: true });
+  const statePath = updateWorkState(workDir, {
+    hasPotentialSkill: true,
+    potentialSkillName: ensureExtension(safeSkillName, ".md"),
+  });
 
   return {
     skillPath,
     statePath,
     workDir,
+  };
+}
+
+function getPotentialSkill({ skillName, rootDir = defaultDataDir }) {
+  const safeSkillName = ensureExtension(assertSafeName(skillName, "skillName"), ".md");
+  const skillPath = path.join(rootDir, "potential_skill", safeSkillName);
+
+  if (!fs.existsSync(skillPath)) {
+    throw new Error(`Potential skill does not exist: ${skillPath}`);
+  }
+
+  return {
+    content: fs.readFileSync(skillPath, "utf8"),
+    skillName: safeSkillName,
+    skillPath,
   };
 }
 
@@ -413,6 +504,9 @@ module.exports = {
   addWorkTask,
   discardSkill,
   discardWork,
+  getPotentialSkill,
+  getTask,
+  getWork,
   getWorkSkillReference,
   getWorksExceedingTaskLimit,
   listPotentialSkillPaths,

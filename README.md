@@ -1,12 +1,12 @@
 # SkillForSkill
 
-SkillForSkill helps Codex notice repeated work patterns and turn them into reusable skill candidates.
+SkillForSkill helps Codex record meaningful completed tasks and turn accumulated work into skill candidates.
 
 After each meaningful task, the installed SkillForSkill instructions guide the agent to:
 
-- Decide whether the task is worth recording.
-- Group similar tasks into reusable work categories.
-- Track repeated tasks under `~/.SkillForSkillStorage`.
+- Record the task unless a basic skip condition applies.
+- Group related tasks into stable work categories.
+- Track recorded tasks under `~/.SkillForSkillStorage`.
 - Suggest a potential skill when a work category appears often enough.
 - Respect user decisions to reject or stop prompting for certain skill ideas.
 
@@ -17,10 +17,11 @@ Feedback and suggestions are welcome. Feel free to open an issue or contact me a
 ## Requirements
 
 - Node.js
+- npm
 - Codex
 - macOS/Linux shell, WSL, or Git Bash
 
-No `npm install` or build step is required for normal use. The project currently uses only Node.js built-in modules and local files.
+Run `npm install` before starting the REST server.
 
 ## Installation
 
@@ -46,7 +47,8 @@ If `--target` is omitted, the installer defaults to Codex.
 
 The installer temporarily generates `skills/SkillForSkill/SKILL.md` from `agent-operations.md`, replacing local placeholders with:
 
-- The absolute path to this repository's `main.js`.
+- The absolute path to this repository.
+- The default REST server URL.
 - The storage directory `~/.SkillForSkillStorage`.
 
 Then it installs the generated skill into Codex and removes the temporary project `skills/` directory after the copy and config update succeed:
@@ -113,29 +115,157 @@ The default candidate threshold is configured in `config.json`:
 
 A work category becomes a skill candidate when its task count is greater than this threshold and it has not already produced a potential skill.
 
-## Manual CLI Usage
+## REST Server Usage
 
-Agents normally run these commands through the installed SkillForSkill instructions. You can also run them manually:
-
-```bash
-node [absolute path to SkillForSkill]/main.js --- <command> [--key value]
-```
-
-Available commands:
+Install dependencies:
 
 ```bash
-node main.js --- list-works
-node main.js --- list-works --includeFutureUnneededDiscardedWork true
-node main.js --- list-work-candidates
-node main.js --- list-potential-skills
-node main.js --- get-work-skill-reference --workName <workName>
-node main.js --- add-work --workName <workName> --description "<description>"
-node main.js --- add-task --workName <workName> --taskName <taskName> --content "<taskContent>"
-node main.js --- add-potential-skill --workName <workName> --skillName <skillName> --content "<skillMarkdown>"
-node main.js --- discard-work --workName <workName> --isFutureWorkUnneeded false
+npm install
 ```
 
-CLI output is JSON.
+Start the server:
+
+```bash
+npm start
+```
+
+This runs:
+
+```bash
+node server.js
+```
+
+By default, the server reads `server-contract.json` and listens on the first available fallback URL:
+
+```txt
+http://127.0.0.1:3000
+http://127.0.0.1:3001
+http://127.0.0.1:3002
+http://127.0.0.1:3003
+http://127.0.0.1:3004
+```
+
+Agents should use the scoped client for normal server discovery and command calls:
+
+```bash
+node scripts/skillforskill-client.js ensure-server
+```
+
+The client checks the fallback URLs from `server-contract.json`, starts `server.js` if needed, and prints the selected server URL. In approval-based environments, agents should request persistent approval for the narrow command prefix:
+
+```txt
+node <SkillForSkill project>/scripts/skillforskill-client.js
+```
+
+For manual debugging, verify which fallback URL is connected to SkillForSkill:
+
+```bash
+curl -sS http://127.0.0.1:3000/api/health
+```
+
+Expected response:
+
+```json
+{
+  "ok": true,
+  "service": "SkillForSkill",
+  "mode": "rest",
+  "version": "0.0.0"
+}
+```
+
+If this check fails, try the next fallback URL from `server-contract.json`. If all checks fail, the server is not running or all contract ports are unavailable.
+
+Open the user-facing workspace in a browser:
+
+```txt
+<selected-server-url>/user-space
+```
+
+The top bar includes a `Close server` link to:
+
+```txt
+<selected-server-url>/pid
+```
+
+This page shows the running server process ID, so you can close a background server manually with your operating system's process tools.
+
+Detail pages use URL parameters:
+
+```txt
+<selected-server-url>/user-space/work?workName=<workName>&source=work
+<selected-server-url>/user-space/task?workName=<workName>&taskName=<task.md>&source=work
+<selected-server-url>/user-space/potential-skill?skillName=<skill.md>
+```
+
+SkillForSkill exposes exactly two command endpoints:
+
+| Method | Endpoint | Command type |
+| --- | --- | --- |
+| GET | `/api/read` | Read commands |
+| POST | `/api/write` | Write commands |
+
+Both endpoints use a JSON request body:
+
+```json
+{
+  "command": "list-works",
+  "args": {}
+}
+```
+
+Browser pages can also call the read endpoint with query parameters:
+
+```txt
+GET /api/read?command=list-works&args=%7B%22includeFutureUnneededDiscardedWork%22%3Atrue%7D
+```
+
+Available read commands:
+
+- `list-works`
+- `list-work-candidates`
+- `list-potential-skills`
+- `get-work-skill-reference`
+- `get-work`
+- `get-task`
+- `get-potential-skill`
+
+Available write commands:
+
+- `add-work`
+- `add-task`
+- `add-potential-skill`
+- `discard-work`
+
+Preferred agent read:
+
+```bash
+node scripts/skillforskill-client.js read list-works '{"includeFutureUnneededDiscardedWork":true}'
+```
+
+Preferred agent write:
+
+```bash
+node scripts/skillforskill-client.js write add-work '{"workName":"debugging","description":"Handle debugging tasks and similar work that can be investigated through repeatable steps."}'
+```
+
+Raw REST read:
+
+```bash
+curl -sS -X GET "${SELECTED_SKILLFORSKILL_SERVER_URL}/api/read" \
+  -H 'Content-Type: application/json' \
+  -d '{"command":"list-works","args":{"includeFutureUnneededDiscardedWork":true}}'
+```
+
+Raw REST write:
+
+```bash
+curl -sS -X POST "${SELECTED_SKILLFORSKILL_SERVER_URL}/api/write" \
+  -H 'Content-Type: application/json' \
+  -d '{"command":"add-work","args":{"workName":"debugging","description":"Handle debugging tasks and similar work that can be investigated through repeatable steps."}}'
+```
+
+Responses are JSON.
 
 ## Notes
 

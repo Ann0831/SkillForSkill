@@ -10,9 +10,11 @@ const GLOBAL_INSTRUCTIONS = [
   BEGIN_MARKER,
   "After completing any meaningful user task, use the `SkillForSkill` skill if it is available.",
   "",
+  "The first SkillForSkill step is to find a usable SkillForSkill server URL with the scoped client before recording the task. Reading the skill without server discovery is incomplete.",
+  "",
   "If `SkillForSkill` is not available in the current Codex session, and the current workspace contains `agent-operations.md`, follow that file directly before sending the final response.",
   "",
-  "Skip this flow only when the interaction is pure conversation, the user explicitly asks not to record the task, or the task is not complete.",
+  "Skip this flow only when the interaction is pure conversation, the user explicitly asks not to use SkillForSkill or not to record the task, or the task is not complete.",
   END_MARKER,
 ].join("\n");
 

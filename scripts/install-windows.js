@@ -11,7 +11,8 @@ const GENERATED_SKILLS_DIR = path.join(REPO_ROOT, "skills");
 const PROJECT_SKILL_DIR = path.join(GENERATED_SKILLS_DIR, SKILL_NAME);
 const SOURCE_DOC = path.join(REPO_ROOT, "agent-operations.md");
 const TARGET_SKILL_MD = path.join(PROJECT_SKILL_DIR, "SKILL.md");
-const MAIN_JS_PATH = path.join(REPO_ROOT, "main.js");
+const SERVER_ENTRYPOINT = path.join(REPO_ROOT, "server.js");
+const SERVER_CONTRACT_PATH = path.join(REPO_ROOT, "server-contract.json");
 const HOME_DIR = process.env.USERPROFILE || os.homedir();
 const DATA_DIR = path.join(HOME_DIR, ".SkillForSkillStorage");
 const CODEX_CONFIG_PATH = path.join(HOME_DIR, ".codex", "config.toml");
@@ -76,14 +77,22 @@ function generateSkillFile() {
   const frontmatter = [
     "---",
     "name: SkillForSkill",
-    "description: Use at the end of every meaningful user task that produced code, files, analysis, commands, debugging, implementation, documentation, or other reusable work, to decide whether to record the task in SkillForSkill, classify work, add tasks, evaluate skill candidates, create potential skills, or process user confirmation about suggested skills.",
+    "description: Use at the end of every meaningful user task that produced code, files, analysis, commands, debugging, implementation, documentation, or other task output, to record the task in SkillForSkill, classify work, add tasks, evaluate skill candidates, create potential skills, or process user confirmation about suggested skills.",
     "---",
     "",
   ].join("\n");
 
   const sourceText = fs.readFileSync(SOURCE_DOC, "utf8");
+  const serverContract = JSON.parse(fs.readFileSync(SERVER_CONTRACT_PATH, "utf8"));
+  const serverUrls = serverContract.ports
+    .map((port) => `http://${serverContract.host}:${port}`)
+    .join("\n");
   const body = replaceAllText(
-    replaceAllText(sourceText, "__SKILLFORSKILL_MAIN_JS__", MAIN_JS_PATH),
+    replaceAllText(
+      replaceAllText(sourceText, "__SKILLFORSKILL_PROJECT_DIR__", REPO_ROOT),
+      "__SKILLFORSKILL_SERVER_URLS__",
+      serverUrls,
+    ),
     "__SKILLFORSKILL_DATA_DIR__",
     DATA_DIR,
   );
@@ -124,7 +133,8 @@ function main() {
   const target = parseTarget(process.argv.slice(2));
 
   requireFile(SOURCE_DOC, "source doc");
-  requireFile(MAIN_JS_PATH, "CLI entrypoint");
+  requireFile(SERVER_ENTRYPOINT, "server entrypoint");
+  requireFile(SERVER_CONTRACT_PATH, "server contract");
   requireFile(
     target === "codex" ? CODEX_CONFIG_HELPER : CLAUDE_MEMORY_HELPER,
     target === "codex" ? "config helper" : "Claude memory helper",
@@ -138,7 +148,8 @@ function main() {
     removeGeneratedProjectSkills();
 
     console.log(`Installed ${SKILL_NAME} to ${userSkillDir}`);
-    console.log(`CLI entrypoint: ${MAIN_JS_PATH}`);
+    console.log(`Server entrypoint: ${SERVER_ENTRYPOINT}`);
+    console.log(`REST server contract: ${SERVER_CONTRACT_PATH}`);
     console.log(`Data directory: ${DATA_DIR}`);
     console.log(`Codex config: ${CODEX_CONFIG_PATH}`);
     console.log("Restart Codex or open a new thread to reload skill metadata and global instructions.");
@@ -150,7 +161,8 @@ function main() {
   removeGeneratedProjectSkills();
 
   console.log(`Installed ${SKILL_NAME} to ${userSkillDir}`);
-  console.log(`CLI entrypoint: ${MAIN_JS_PATH}`);
+  console.log(`Server entrypoint: ${SERVER_ENTRYPOINT}`);
+  console.log(`REST server contract: ${SERVER_CONTRACT_PATH}`);
   console.log(`Data directory: ${DATA_DIR}`);
   console.log(`Claude memory: ${CLAUDE_MEMORY_PATH}`);
   console.log("Restart Claude Code or open a new session to reload skill metadata and global instructions.");

@@ -53,13 +53,16 @@ Each work type folder should also include a `state.json` that stores the current
 ```json
 {
   "hasPotentialSkill": false,
-  "isSkillCandidate": null
+  "isSkillCandidate": null,
+  "potentialSkillName": null
 }
 ```
 
 `hasPotentialSkill` indicates whether this work type has already been turned into a potential skill. The default value is `false`.
 
 `isSkillCandidate` indicates whether this work type is suitable for conversion into a skill. The default value is `null`, meaning it has not yet been judged. Later code may update it to `true` or `false` based on agent or system judgment.
+
+`potentialSkillName` stores the generated potential skill Markdown filename when `hasPotentialSkill` is `true`. The default value is `null`.
 
 A work type folder may contain multiple task Markdown files, for example:
 

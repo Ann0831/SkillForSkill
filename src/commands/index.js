@@ -3,6 +3,9 @@ const {
   addTaskToWork,
   addWork,
   discardWork,
+  getPotentialSkill,
+  getTask,
+  getWork,
   getWorkSkillReference,
   getWorksExceedingTaskLimit,
   listPotentialSkillPaths,
@@ -82,6 +85,12 @@ async function runCommand({ command, args = {} }) {
       return listPotentialSkillPaths(args);
     case "get-work-skill-reference":
       return getWorkSkillReference(args);
+    case "get-work":
+      return getWork(args);
+    case "get-task":
+      return getTask(args);
+    case "get-potential-skill":
+      return getPotentialSkill(args);
     case "add-work":
       return addWork(args);
     case "add-task":

@@ -7,7 +7,8 @@ GENERATED_SKILLS_DIR="${SCRIPT_DIR}/skills"
 PROJECT_SKILL_DIR="${GENERATED_SKILLS_DIR}/${SKILL_NAME}"
 SOURCE_DOC="${SCRIPT_DIR}/agent-operations.md"
 TARGET_SKILL_MD="${PROJECT_SKILL_DIR}/SKILL.md"
-MAIN_JS_PATH="${SCRIPT_DIR}/main.js"
+SERVER_ENTRYPOINT="${SCRIPT_DIR}/server.js"
+SERVER_CONTRACT_PATH="${SCRIPT_DIR}/server-contract.json"
 DATA_DIR="${HOME}/.SkillForSkillStorage"
 CODEX_CONFIG_PATH="${HOME}/.codex/config.toml"
 CLAUDE_MEMORY_PATH="${HOME}/.claude/CLAUDE.md"
@@ -60,8 +61,13 @@ if [[ ! -f "${SOURCE_DOC}" ]]; then
   exit 1
 fi
 
-if [[ ! -f "${MAIN_JS_PATH}" ]]; then
-  echo "Missing CLI entrypoint: ${MAIN_JS_PATH}" >&2
+if [[ ! -f "${SERVER_ENTRYPOINT}" ]]; then
+  echo "Missing server entrypoint: ${SERVER_ENTRYPOINT}" >&2
+  exit 1
+fi
+
+if [[ ! -f "${SERVER_CONTRACT_PATH}" ]]; then
+  echo "Missing server contract: ${SERVER_CONTRACT_PATH}" >&2
   exit 1
 fi
 
@@ -80,18 +86,29 @@ mkdir -p "${PROJECT_SKILL_DIR}"
 cat > "${TARGET_SKILL_MD}" <<'EOF'
 ---
 name: SkillForSkill
-description: Use at the end of every meaningful user task that produced code, files, analysis, commands, debugging, implementation, documentation, or other reusable work, to decide whether to record the task in SkillForSkill, classify work, add tasks, evaluate skill candidates, create potential skills, or process user confirmation about suggested skills.
+description: Use at the end of every meaningful user task that produced code, files, analysis, commands, debugging, implementation, documentation, or other task output, to record the task in SkillForSkill, classify work, add tasks, evaluate skill candidates, create potential skills, or process user confirmation about suggested skills.
 ---
 
 EOF
 
-main_js_replacement="${MAIN_JS_PATH//&/\\&}"
-data_dir_replacement="${DATA_DIR//&/\\&}"
+project_dir_replacement="${SCRIPT_DIR//&/\\&}"
+node - "${SOURCE_DOC}" "${project_dir_replacement}" "${SERVER_CONTRACT_PATH}" "${DATA_DIR}" <<'NODE' >> "${TARGET_SKILL_MD}"
+const fs = require("fs");
 
-sed \
-  -e "s|__SKILLFORSKILL_MAIN_JS__|${main_js_replacement}|g" \
-  -e "s|__SKILLFORSKILL_DATA_DIR__|${data_dir_replacement}|g" \
-  "${SOURCE_DOC}" >> "${TARGET_SKILL_MD}"
+const [sourceDoc, projectDir, serverContractPath, dataDir] = process.argv.slice(2);
+const sourceText = fs.readFileSync(sourceDoc, "utf8");
+const serverContract = require(serverContractPath);
+const serverUrls = serverContract.ports
+  .map((port) => `http://${serverContract.host}:${port}`)
+  .join("\n");
+
+process.stdout.write(
+  sourceText
+    .split("__SKILLFORSKILL_PROJECT_DIR__").join(projectDir)
+    .split("__SKILLFORSKILL_SERVER_URLS__").join(serverUrls)
+    .split("__SKILLFORSKILL_DATA_DIR__").join(dataDir),
+);
+NODE
 
 if [[ "${TARGET}" == "codex" ]]; then
   USER_SKILLS_DIR="${HOME}/.codex/skills"
@@ -105,7 +122,8 @@ if [[ "${TARGET}" == "codex" ]]; then
 
   echo "Installed ${SKILL_NAME} to ${USER_SKILL_DIR}"
   echo "Removed generated project skill directory: ${GENERATED_SKILLS_DIR}"
-  echo "CLI entrypoint: ${MAIN_JS_PATH}"
+  echo "Server entrypoint: ${SERVER_ENTRYPOINT}"
+  echo "REST server contract: ${SERVER_CONTRACT_PATH}"
   echo "Data directory: ${DATA_DIR}"
   echo "Codex config: ${CODEX_CONFIG_PATH}"
   echo "Restart Codex or open a new thread to reload skill metadata and global instructions."
@@ -123,7 +141,8 @@ rm -rf "${GENERATED_SKILLS_DIR}"
 
 echo "Installed ${SKILL_NAME} to ${USER_SKILL_DIR}"
 echo "Removed generated project skill directory: ${GENERATED_SKILLS_DIR}"
-echo "CLI entrypoint: ${MAIN_JS_PATH}"
+echo "Server entrypoint: ${SERVER_ENTRYPOINT}"
+echo "REST server contract: ${SERVER_CONTRACT_PATH}"
 echo "Data directory: ${DATA_DIR}"
 echo "Claude memory: ${CLAUDE_MEMORY_PATH}"
 echo "Restart Claude Code or open a new session to reload skill metadata and global instructions."
