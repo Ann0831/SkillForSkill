@@ -21,11 +21,11 @@ Feedback and suggestions are welcome. Feel free to open an issue or contact me a
 - Codex
 - macOS/Linux shell, WSL, or Git Bash
 
-Run `npm install` before starting the REST server.
+From inside the downloaded `SkillForSkill` project directory, run `npm install` before starting the REST server.
 
 ## Installation
 
-Clone or download this repository, then run the installer.
+Clone or download this repository, enter the downloaded `SkillForSkill` project directory, then run the installer.
 
 ### macOS, Linux, WSL, or Git Bash
 
@@ -117,7 +117,7 @@ A work category becomes a skill candidate when its task count is greater than th
 
 ## REST Server Usage
 
-Install dependencies:
+From inside the downloaded `SkillForSkill` project directory, install dependencies:
 
 ```bash
 npm install
