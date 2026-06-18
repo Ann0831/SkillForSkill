@@ -105,7 +105,7 @@ function main() {
 
   console.log(`Claude memory: ${CLAUDE_MEMORY_PATH}`);
   console.log("Claude memory file is left in place even if it is empty.");
-  console.log("Restart Claude Code or open a new session to reload skill metadata and global instructions.");
+  console.log("Restart Claude Code and open a new session to reload skill metadata and global instructions.");
 }
 
 main();

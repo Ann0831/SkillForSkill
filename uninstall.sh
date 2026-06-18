@@ -89,4 +89,4 @@ node "${CLAUDE_MEMORY_HELPER}" uninstall "${CLAUDE_MEMORY_PATH}"
 
 echo "Claude memory: ${CLAUDE_MEMORY_PATH}"
 echo "Claude memory file is left in place even if it is empty."
-echo "Restart Claude Code or open a new session to reload skill metadata and global instructions."
+echo "Restart Claude Code and open a new session to reload skill metadata and global instructions."

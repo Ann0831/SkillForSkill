@@ -165,7 +165,7 @@ function main() {
   console.log(`REST server contract: ${SERVER_CONTRACT_PATH}`);
   console.log(`Data directory: ${DATA_DIR}`);
   console.log(`Claude memory: ${CLAUDE_MEMORY_PATH}`);
-  console.log("Restart Claude Code or open a new session to reload skill metadata and global instructions.");
+  console.log("Restart Claude Code and open a new session to reload skill metadata and global instructions.");
 }
 
 main();
