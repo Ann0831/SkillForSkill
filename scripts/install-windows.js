@@ -152,7 +152,7 @@ function main() {
     console.log(`REST server contract: ${SERVER_CONTRACT_PATH}`);
     console.log(`Data directory: ${DATA_DIR}`);
     console.log(`Codex config: ${CODEX_CONFIG_PATH}`);
-    console.log("Restart Codex or open a new thread to reload skill metadata and global instructions.");
+    console.log("Restart Codex and open a new thread to reload skill metadata and global instructions.");
     return;
   }
 

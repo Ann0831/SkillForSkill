@@ -96,7 +96,7 @@ function main() {
     runHelper(CODEX_CONFIG_HELPER, "uninstall", CODEX_CONFIG_PATH);
 
     console.log(`Codex config: ${CODEX_CONFIG_PATH}`);
-    console.log("Restart Codex or open a new thread to reload skill metadata and global instructions.");
+    console.log("Restart Codex and open a new thread to reload skill metadata and global instructions.");
     return;
   }
 

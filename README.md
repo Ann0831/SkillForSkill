@@ -61,7 +61,7 @@ The global instruction block is wrapped with SkillForSkill markers so uninstall 
 
 The repository's `skills/` directory is an install-time generated artifact. It is not kept in the project after a successful install; the runtime copy lives under the target user's skill directory.
 
-After installing, restart Codex or open a new thread, so the agent reloads skill metadata and global instructions.
+After installing, restart Codex and open a new thread, so the agent reloads skill metadata and global instructions.
 
 ## Uninstallation
 

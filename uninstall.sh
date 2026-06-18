@@ -72,7 +72,7 @@ if [[ "${TARGET}" == "codex" ]]; then
   node "${CODEX_CONFIG_HELPER}" uninstall "${CODEX_CONFIG_PATH}"
 
   echo "Codex config: ${CODEX_CONFIG_PATH}"
-  echo "Restart Codex or open a new thread to reload skill metadata and global instructions."
+  echo "Restart Codex and open a new thread to reload skill metadata and global instructions."
   exit 0
 fi
 

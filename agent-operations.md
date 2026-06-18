@@ -10,7 +10,7 @@ Reading this skill is not sufficient. The first observable action for a complete
 
 Only after the scoped client returns a usable server URL should the agent record the task unless a storage skip condition applies.
 
-Existing Codex sessions may need a new thread or restart before they load this stronger instruction.
+Existing Codex sessions may need a Codex restart and a new thread before they load this stronger instruction.
 
 ## Trigger Timing
 

@@ -126,7 +126,7 @@ if [[ "${TARGET}" == "codex" ]]; then
   echo "REST server contract: ${SERVER_CONTRACT_PATH}"
   echo "Data directory: ${DATA_DIR}"
   echo "Codex config: ${CODEX_CONFIG_PATH}"
-  echo "Restart Codex or open a new thread to reload skill metadata and global instructions."
+  echo "Restart Codex and open a new thread to reload skill metadata and global instructions."
   exit 0
 fi
 
