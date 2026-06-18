@@ -69,8 +69,8 @@ function removeSkill(userSkillDir) {
   }
 }
 
-function runHelper(helperPath, action, targetPath, ...extraArgs) {
-  const result = spawnSync(process.execPath, [helperPath, action, targetPath, ...extraArgs], {
+function runHelper(helperPath, action, targetPath) {
+  const result = spawnSync(process.execPath, [helperPath, action, targetPath], {
     stdio: "inherit",
   });
 
@@ -93,7 +93,7 @@ function main() {
 
   if (target === "codex") {
     removeSkill(path.join(HOME_DIR, ".codex", "skills", SKILL_NAME));
-    runHelper(CODEX_CONFIG_HELPER, "uninstall", CODEX_CONFIG_PATH, REPO_ROOT);
+    runHelper(CODEX_CONFIG_HELPER, "uninstall", CODEX_CONFIG_PATH);
 
     console.log(`Codex config: ${CODEX_CONFIG_PATH}`);
     console.log("Restart Codex and open a new thread to reload skill metadata and global instructions.");

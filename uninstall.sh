@@ -69,7 +69,7 @@ if [[ "${TARGET}" == "codex" ]]; then
     echo "${SKILL_NAME} skill directory is already uninstalled."
   fi
 
-  node "${CODEX_CONFIG_HELPER}" uninstall "${CODEX_CONFIG_PATH}" "${SCRIPT_DIR}"
+  node "${CODEX_CONFIG_HELPER}" uninstall "${CODEX_CONFIG_PATH}"
 
   echo "Codex config: ${CODEX_CONFIG_PATH}"
   echo "Restart Codex and open a new thread to reload skill metadata and global instructions."
